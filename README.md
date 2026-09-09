@@ -1,12 +1,24 @@
 # Codex model benchmarks
 
-![Codex model latency on the same coding task](assets/codex-model-latency.png)
+![Spark finished the task before Astra started writing](assets/total-time.png)
 
 A reproducible, Codex-layer latency test across GPT-6 Astra, GPT-5.6 Sol,
 GPT-5.6 Terra, GPT-5.6 Luna, and GPT-5.3 Codex Spark.
 
 In this run, Spark completed the entire task before Astra emitted its first
 code token. All ten generated programs compiled and completed a scripted game.
+
+## Metric cards
+
+Each card leads with the interpretation and uses the chart as supporting
+evidence.
+
+![Sol starts fastest on high; Spark starts fastest on xhigh](assets/ttft.png)
+
+![Spark's delivered-TPS lead reflects chunky streaming](assets/delivered-tps.png)
+
+The original combined latency view is available as
+[`assets/codex-model-latency.png`](assets/codex-model-latency.png).
 
 ## Results
 
@@ -82,6 +94,7 @@ Rendering the committed chart requires
 
 ```bash
 npm run chart:png
+npm run cards:png
 ```
 
 ## Method and limitations

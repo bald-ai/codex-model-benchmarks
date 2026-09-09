@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <pattern id="xhighPattern" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="10" height="10" fill="#3A261E"/>
+      <rect width="4" height="10" fill="#F4A261"/>
+    </pattern>
+    <style>
+      text { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .eyebrow { fill: #AEB4C2; font-size: 19px; font-weight: 760; letter-spacing: 3px; }
+      .headline { fill: #F7F8FC; font-size: 62px; font-weight: 790; letter-spacing: -1.8px; }
+      .subtitle { fill: #AEB4C2; font-size: 21px; font-weight: 480; }
+      .model { fill: #F7F8FC; font-size: 22px; font-weight: 680; }
+      .effort { fill: #AEB4C2; font-size: 17px; font-weight: 650; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .value { fill: #F7F8FC; font-size: 18px; font-weight: 730; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .axis { fill: #818898; font-size: 17px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .footer { fill: #818898; font-size: 15px; }
+      .note { fill: #AEB4C2; font-size: 16px; }
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#0B0D12"/>
+  <text x="55" y="54" class="eyebrow">TIME TO FIRST TOKEN</text>
+  <text x="55" y="128" class="headline">Sol starts fastest on high.</text>
+  <text x="55" y="197" class="headline">Spark starts fastest on xhigh.</text>
+  <text x="55" y="240" class="subtitle">Time from turn/start to first generated code delta · lower is better</text>
+  <g transform="translate(1240, 268)">
+    <rect x="0" y="-15" width="20" height="15" rx="3" fill="#F15BB5"/>
+    <text x="30" y="-2" class="footer">high</text>
+    <rect x="100" y="-15" width="20" height="15" rx="3" fill="url(#xhighPattern)" stroke="#F4A261"/>
+    <text x="130" y="-2" class="footer">xhigh</text>
+  </g><line x1="360" y1="300" x2="360" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="360" y="814" text-anchor="middle" class="axis">0s</text><line x1="546.6666666666666" y1="300" x2="546.6666666666666" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="546.6666666666666" y="814" text-anchor="middle" class="axis">5s</text><line x1="733.3333333333333" y1="300" x2="733.3333333333333" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="733.3333333333333" y="814" text-anchor="middle" class="axis">10s</text><line x1="920" y1="300" x2="920" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="920" y="814" text-anchor="middle" class="axis">15s</text><line x1="1106.6666666666665" y1="300" x2="1106.6666666666665" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="1106.6666666666665" y="814" text-anchor="middle" class="axis">20s</text><line x1="1293.3333333333335" y1="300" x2="1293.3333333333335" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="1293.3333333333335" y="814" text-anchor="middle" class="axis">25s</text><line x1="1480" y1="300" x2="1480" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="1480" y="814" text-anchor="middle" class="axis">30s</text><text x="55" y="348" class="model">Codex Spark</text><text x="286" y="329" class="effort">high</text><rect x="360" y="310" width="310.8202938026666" height="24" rx="4" fill="#F15BB5" stroke="#F15BB5" stroke-width="2"/><text x="682.8202938026666" y="329" class="value">8.3s</text><text x="286" y="363" class="effort">xhigh</text><rect x="360" y="344" width="254.02466753066676" height="24" rx="4" fill="url(#xhighPattern)" stroke="#F4A261" stroke-width="2"/><text x="626.0246675306668" y="363" class="value">6.8s</text><text x="55" y="442" class="model">Terra</text><text x="286" y="423" class="effort">high</text><rect x="360" y="404" width="199.47969223466635" height="24" rx="4" fill="#F15BB5" stroke="#F15BB5" stroke-width="2"/><text x="571.4796922346663" y="423" class="value">5.3s</text><text x="286" y="457" class="effort">xhigh</text><rect x="360" y="438" width="671.0872124319997" height="24" rx="4" fill="url(#xhighPattern)" stroke="#F4A261" stroke-width="2"/><text x="1043.0872124319997" y="457" class="value">18.0s</text><text x="55" y="536" class="model">Sol</text><text x="286" y="517" class="effort">high</text><rect x="360" y="498" width="155.65015043200026" height="24" rx="4" fill="#F15BB5" stroke="#F15BB5" stroke-width="2"/><text x="527.6501504320003" y="517" class="value">4.2s</text><text x="286" y="551" class="effort">xhigh</text><rect x="360" y="532" width="742.414494901333" height="24" rx="4" fill="url(#xhighPattern)" stroke="#F4A261" stroke-width="2"/><text x="1114.414494901333" y="551" class="value">19.9s</text><text x="55" y="630" class="model">Luna</text><text x="286" y="611" class="effort">high</text><rect x="360" y="592" width="478.62654466666663" height="24" rx="4" fill="#F15BB5" stroke="#F15BB5" stroke-width="2"/><text x="850.6265446666666" y="611" class="value">12.8s</text><text x="286" y="645" class="effort">xhigh</text><rect x="360" y="626" width="520.1452666666675" height="24" rx="4" fill="url(#xhighPattern)" stroke="#F4A261" stroke-width="2"/><text x="892.1452666666675" y="645" class="value">13.9s</text><text x="55" y="724" class="model">Astra</text><text x="286" y="705" class="effort">high</text><rect x="360" y="686" width="572.4895353333329" height="24" rx="4" fill="#F15BB5" stroke="#F15BB5" stroke-width="2"/><text x="944.4895353333329" y="705" class="value">15.3s</text><text x="286" y="739" class="effort">xhigh</text><rect x="360" y="720" width="1019.3233229013333" height="24" rx="4" fill="url(#xhighPattern)" stroke="#F4A261" stroke-width="2"/><text x="1391.3233229013333" y="739" class="value">27.3s</text>
+  <line x1="55" y1="840" x2="1545" y2="840" stroke="#2B2F3A" stroke-width="1"/>
+  <text x="55" y="872" class="footer">TypeScript terminal Tic-Tac-Toe · Codex CLI 0.153.4 · Sep 8, 2026 · n=1 per condition</text>
+  <text x="1545" y="872" text-anchor="end" class="note"></text>
+</svg>

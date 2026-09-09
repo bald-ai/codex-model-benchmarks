@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <pattern id="xhighPattern" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="10" height="10" fill="#3A261E"/>
+      <rect width="4" height="10" fill="#F4A261"/>
+    </pattern>
+    <style>
+      text { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .eyebrow { fill: #AEB4C2; font-size: 19px; font-weight: 760; letter-spacing: 3px; }
+      .headline { fill: #F7F8FC; font-size: 62px; font-weight: 790; letter-spacing: -1.8px; }
+      .subtitle { fill: #AEB4C2; font-size: 21px; font-weight: 480; }
+      .model { fill: #F7F8FC; font-size: 22px; font-weight: 680; }
+      .effort { fill: #AEB4C2; font-size: 17px; font-weight: 650; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .value { fill: #F7F8FC; font-size: 18px; font-weight: 730; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .axis { fill: #818898; font-size: 17px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .footer { fill: #818898; font-size: 15px; }
+      .note { fill: #AEB4C2; font-size: 16px; }
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#0B0D12"/>
+  <text x="55" y="54" class="eyebrow">DELIVERED TOKENS PER SECOND</text>
+  <text x="55" y="128" class="headline">Spark’s 16–33× delivery lead</text>
+  <text x="55" y="197" class="headline">reflects chunky streaming.</text>
+  <text x="55" y="240" class="subtitle">Client-observed visible-token delivery · logarithmic scale · higher is better</text>
+  <g transform="translate(1240, 268)">
+    <circle cx="10" cy="-8" r="8" fill="#F15BB5"/>
+    <text x="30" y="-2" class="footer">high</text>
+    <rect x="101" y="-16" width="16" height="16" fill="#0B0D12" stroke="#F4A261" stroke-width="3"/>
+    <text x="130" y="-2" class="footer">xhigh</text>
+  </g><line x1="360" y1="300" x2="360" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="360" y="814" text-anchor="middle" class="axis">20 TPS</text><line x1="582.846404856341" y1="300" x2="582.846404856341" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="582.846404856341" y="814" text-anchor="middle" class="axis">50 TPS</text><line x1="751.4232024281705" y1="300" x2="751.4232024281705" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="751.4232024281705" y="814" text-anchor="middle" class="axis">100 TPS</text><line x1="1142.846404856341" y1="300" x2="1142.846404856341" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="1142.846404856341" y="814" text-anchor="middle" class="axis">500 TPS</text><line x1="1480" y1="300" x2="1480" y2="788" stroke="#2B2F3A" stroke-width="1"/><text x="1480" y="814" text-anchor="middle" class="axis">2,000 TPS</text><text x="55" y="348" class="model">Codex Spark</text><text x="286" y="328" class="effort">high</text><line x1="360" y1="322" x2="1465.6395094258025" y2="322" stroke="#3A3F4C" stroke-width="2"/><circle cx="1465.6395094258025" cy="322" r="9" fill="#F15BB5"/><text x="1479.6395094258025" y="328" class="value">1,885 TPS</text><text x="286" y="362" class="effort">xhigh</text><line x1="360" y1="356" x2="1403.2025867811074" y2="356" stroke="#3A3F4C" stroke-width="2"/><rect x="1395.2025867811074" y="348" width="16" height="16" fill="#0B0D12" stroke="#F4A261" stroke-width="3"/><text x="1417.2025867811074" y="362" class="value">1,458 TPS</text><text x="55" y="442" class="model">Terra</text><text x="286" y="422" class="effort">high</text><line x1="360" y1="416" x2="612.2929132620113" y2="416" stroke="#3A3F4C" stroke-width="2"/><circle cx="612.2929132620113" cy="416" r="9" fill="#F15BB5"/><text x="626.2929132620113" y="422" class="value">56 TPS</text><text x="286" y="456" class="effort">xhigh</text><line x1="360" y1="450" x2="726.2041875516777" y2="450" stroke="#3A3F4C" stroke-width="2"/><rect x="718.2041875516777" y="442" width="16" height="16" fill="#0B0D12" stroke="#F4A261" stroke-width="3"/><text x="740.2041875516777" y="456" class="value">90 TPS</text><text x="55" y="536" class="model">Luna</text><text x="286" y="516" class="effort">high</text><line x1="360" y1="510" x2="611.1343361037218" y2="510" stroke="#3A3F4C" stroke-width="2"/><circle cx="611.1343361037218" cy="510" r="9" fill="#F15BB5"/><text x="625.1343361037218" y="516" class="value">56 TPS</text><text x="286" y="550" class="effort">xhigh</text><line x1="360" y1="544" x2="610.528832679066" y2="544" stroke="#3A3F4C" stroke-width="2"/><rect x="602.528832679066" y="536" width="16" height="16" fill="#0B0D12" stroke="#F4A261" stroke-width="3"/><text x="624.528832679066" y="550" class="value">56 TPS</text><text x="55" y="630" class="model">Astra</text><text x="286" y="610" class="effort">high</text><line x1="360" y1="604" x2="535.62307967045" y2="604" stroke="#3A3F4C" stroke-width="2"/><circle cx="535.62307967045" cy="604" r="9" fill="#F15BB5"/><text x="549.62307967045" y="610" class="value">41 TPS</text><text x="286" y="644" class="effort">xhigh</text><line x1="360" y1="638" x2="570.4122450035629" y2="638" stroke="#3A3F4C" stroke-width="2"/><rect x="562.4122450035629" y="630" width="16" height="16" fill="#0B0D12" stroke="#F4A261" stroke-width="3"/><text x="584.4122450035629" y="644" class="value">48 TPS</text><text x="55" y="724" class="model">Sol</text><text x="286" y="704" class="effort">high</text><line x1="360" y1="698" x2="470.2113505497814" y2="698" stroke="#3A3F4C" stroke-width="2"/><circle cx="470.2113505497814" cy="698" r="9" fill="#F15BB5"/><text x="484.2113505497814" y="704" class="value">31 TPS</text><text x="286" y="738" class="effort">xhigh</text><line x1="360" y1="732" x2="482.8208573551087" y2="732" stroke="#3A3F4C" stroke-width="2"/><rect x="474.8208573551087" y="724" width="16" height="16" fill="#0B0D12" stroke="#F4A261" stroke-width="3"/><text x="496.8208573551087" y="738" class="value">33 TPS</text>
+  <line x1="55" y1="840" x2="1545" y2="840" stroke="#2B2F3A" stroke-width="1"/>
+  <text x="55" y="872" class="footer">TypeScript terminal Tic-Tac-Toe · Codex CLI 0.153.4 · Sep 8, 2026 · n=1 per condition</text>
+  <text x="1545" y="872" text-anchor="end" class="note">Spark emitted only 16–17 large deltas; this is not decoder throughput</text>
+</svg>

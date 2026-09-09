@@ -7,7 +7,9 @@
   "scripts": {
     "bench": "node benchmark.mjs",
     "chart": "node scripts/render-chart.mjs results/2026-09-08/summary.json assets/codex-model-latency.svg",
-    "chart:png": "npm run chart && rsvg-convert -w 1600 -h 900 assets/codex-model-latency.svg -o assets/codex-model-latency.png"
+    "chart:png": "npm run chart && rsvg-convert -w 1600 -h 900 assets/codex-model-latency.svg -o assets/codex-model-latency.png",
+    "cards": "node scripts/render-cards.mjs results/2026-09-08/summary.json assets",
+    "cards:png": "npm run cards && rsvg-convert -w 1600 -h 900 assets/total-time.svg -o assets/total-time.png && rsvg-convert -w 1600 -h 900 assets/ttft.svg -o assets/ttft.png && rsvg-convert -w 1600 -h 900 assets/delivered-tps.svg -o assets/delivered-tps.png"
   },
   "engines": {
     "node": ">=22"
