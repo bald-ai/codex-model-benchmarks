@@ -1,0 +1,16 @@
+{
+  "name": "codex-model-benchmarks",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reproducible Codex model TTFT, delivered TPS, and completion-time measurements.",
+  "type": "module",
+  "scripts": {
+    "bench": "node benchmark.mjs",
+    "chart": "node scripts/render-chart.mjs results/2026-09-08/summary.json assets/codex-model-latency.svg",
+    "chart:png": "npm run chart && rsvg-convert -w 1600 -h 900 assets/codex-model-latency.svg -o assets/codex-model-latency.png"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}
