@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 2,
+  "failure": null,
+  "measuredAt": "2026-10-02T14:50:13.861Z",
+  "codexCliVersion": "codex-cli 0.153.4",
+  "transport": "Codex app-server over stdio",
+  "serviceTier": "fast",
+  "sampleCountPerCondition": 1,
+  "prompt": "Generate a complete, runnable TypeScript program for a two-player Tic-Tac-Toe game played in a terminal. It must use Node.js's built-in readline module, render a numbered 3x3 board, alternate X and O, validate input, reject occupied cells, detect wins and draws, announce the result, and close cleanly. Produce the solution in one response. Return only TypeScript source code, with no Markdown fences, preamble, explanation, or follow-up.",
+  "runOrder": [
+    {
+      "model": "gpt-5.6-sol",
+      "effort": "high"
+    }
+  ],
+  "results": [
+    {
+      "model": "gpt-5.6-sol",
+      "effort": "high",
+      "requestedServiceTier": "fast",
+      "requestedProtocolTier": "priority",
+      "acknowledgedThreadServiceTier": "priority",
+      "effectiveServiceTier": null,
+      "effectiveServiceTiers": [],
+      "effectiveTierSource": "not exposed",
+      "executionOrder": 1,
+      "ttftMs": 6701.016833,
+      "totalMs": 16928.445917,
+      "outputTokens": 755,
+      "reasoningTokens": 81,
+      "visibleTokens": 674,
+      "streamTps": 70.00193245319836,
+      "effectiveTps": 39.81464118470267,
+      "inputTokens": 14513,
+      "cachedInputTokens": 0,
+      "deltaCount": 667,
+      "turnStatus": "completed",
+      "rerouteCount": 0,
+      "errorCount": 0,
+      "errors": []
+    }
+  ]
+}

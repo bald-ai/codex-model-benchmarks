@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+import readline from 'node:readline';
+import assert from 'node:assert/strict';
+if (process.argv.includes('--version')) { console.log('codex-cli fixture'); process.exit(0); }
+const scenario = process.env.BENCH_TEST_SCENARIO;
+let count = 0;
+const send = (message) => console.log(JSON.stringify(message));
+readline.createInterface({input:process.stdin}).on('line', line => {
+  const { id, method, params } = JSON.parse(line);
+  if (id === undefined) return;
+  const reply = result => send({id, result});
+  if (scenario === 'exit') process.exit(3);
+  if (scenario === 'timeout') return;
+  if (method === 'initialize') return reply({});
+  if (method === 'model/list') return reply({data:[{model:'test-model',supportedReasoningEfforts:[{reasoningEffort:'high'},{reasoningEffort:'low'}],serviceTiers:scenario === 'unsupported' ? [] : [{id:process.env.BENCH_TEST_TIER,name:'Fast'}]}]});
+  if (method === 'thread/start') {
+    assert.equal(params.serviceTier, process.env.BENCH_TEST_TIER);
+    return reply({model:'test-model', serviceTier:scenario === 'ack-mismatch' ? 'default' : params.serviceTier, thread:{id:'thread'}});
+  }
+  if (method === 'turn/start') {
+    assert.equal(params.serviceTierForTurn, process.env.BENCH_TEST_TIER);
+    if (scenario === 'rpc-error') return send({id,error:{code:-32602,message:'Unsupported service tier'}});
+    count++;
+    reply({turn:{id:`turn-${count}`}});
+    const p = {threadId:'thread',turnId:`turn-${count}`};
+    if (scenario !== 'failed') {
+      send({method:'item/agentMessage/delta',params:{...p,delta:'console.log(1);'}});
+      send({method:'rawResponse/completed',params:{...p,usage:{outputTokens:5,reasoningOutputTokens:0}, usageMetadata:{metadata:{service_tier:scenario === 'mismatch' ? 'default' : params.serviceTierForTurn}}}});
+    }
+    send({method:'turn/completed',params:{...p,turn:{status:scenario === 'failed' ? 'failed' : 'completed',error:scenario === 'failed' ? {message:'Test failure'} : null}}});
+  }
+});

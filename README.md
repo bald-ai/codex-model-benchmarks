@@ -1,5 +1,38 @@
 # Codex model benchmarks
 
+This fork adds explicit **Normal / Fast** selection. A bounded two-run
+[functionality smoke test](results/2026-10-02-smoke/README.md) passed using the
+existing Codex subscription login. Original upstream results below are historical.
+
+```bash
+npm test
+npm run bench -- --models gpt-5.6-sol --efforts high --service-tier normal
+npm run bench -- --models gpt-5.6-sol --efforts high --service-tier fast
+```
+
+`--service-tier normal` is the default and explicitly sends `default` on every
+turn, overriding an inherited Fast setting. `fast` resolves the model catalog's
+Fast ID: `fast`, or legacy `priority` when that entry is named Fast. CLI 0.153.4
+on the tested Mac advertises `priority`. The runner passes the ID to thread
+creation and every turn, verifies thread acknowledgement, and refuses unavailable
+tiers, RPC failures, observed tier mismatches, and model reroutes. It never retries
+with a cheaper/slower tier. Fast uses more subscription allowance; see
+[official Codex speed documentation](https://developers.openai.com/codex/agent-configuration/speed).
+
+Schema v2 records requested UI tier, protocol ID, thread acknowledgement, and
+an effective tier **only if explicitly observable in upstream response metadata**.
+Thread acknowledgement is not proof of backend processing. The tested CLI exposed
+no effective tier: the field remains `null`. Missing token/timing data likewise
+remains `null`, not zero. Diagnostic stderr and raw notifications are not saved;
+protocol errors and partial results are recorded in `summary.json`, with nonzero
+exit status for failure. Each RPC and turn has a bounded timeout. The benchmark
+has no npm dependencies and leaves your global Codex configuration unchanged.
+
+Use a fresh output directory per invocation; summary files replace previous
+summaries at the same path. Tier-specific generated filenames prevent code from
+different tiers colliding. `--delay-ms` now defaults to zero. This is still a
+latency runner, not a statistical quality or performance evaluation.
+
 ![Spark finished the task before Astra started writing](assets/total-time.png)
 
 A reproducible, Codex-layer latency test across GPT-6 Astra, GPT-5.6 Sol,
@@ -70,7 +103,7 @@ Requirements:
 - A ChatGPT account signed into Codex
 
 ```bash
-git clone https://github.com/zakmandhro/codex-model-benchmarks.git
+git clone https://github.com/bald-ai/codex-model-benchmarks.git
 cd codex-model-benchmarks
 codex login status
 npm run bench
@@ -99,7 +132,7 @@ npm run cards:png
 
 ## Method and limitations
 
-1. Every run used the same user prompt and benchmark instructions, no tool
+1. Every original September 8 run used the same user prompt and benchmark instructions, no tool
    calls, the default service tier, and a fresh ephemeral Codex thread.
 2. Runs were sequential and interleaved across models to reduce ordering bias.
 3. This is one observation per condition. It is a transparent snapshot, not a
