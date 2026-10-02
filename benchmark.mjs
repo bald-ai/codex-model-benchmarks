@@ -29,6 +29,7 @@ export async function parseArgs(argv) {
   const timestamp = new Date().toISOString().replaceAll(/[:.]/g, "-");
   const options = {
     models: DEFAULT_MODELS,
+    codexBin: "codex",
     efforts: DEFAULT_EFFORTS,
     output: `runs/${timestamp}`,
     prompt: DEFAULT_PROMPT,
@@ -48,7 +49,8 @@ export async function parseArgs(argv) {
     if (name !== "--help" && (!value || value.startsWith("--"))) {
       throw new Error(`Missing value for ${name}`);
     }
-    if (name === "--service-tier") options.serviceTier = value.toLowerCase();
+    if (name === "--codex-bin") options.codexBin = value;
+    else if (name === "--service-tier") options.serviceTier = value.toLowerCase();
     else if (name === "--models") { options.models = value.split(","); options.explicitModels = true; }
     else if (name === "--efforts") options.efforts = value.split(",");
     else if (name === "--output") options.output = value;
@@ -58,7 +60,7 @@ export async function parseArgs(argv) {
     } else if (name === "--delay-ms") options.delayMs = Number(value);
     else if (name === "--timeout-ms") options.timeoutMs = Number(value);
     else if (name === "--help") {
-      console.log(`Usage: node benchmark.mjs [options]\n\nOptions:\n  --allow-unlisted-model  Attempt explicitly requested models missing from catalog\n  --service-tier normal|fast  Service tier (default: normal)\n  --models a,b       Model slugs\n  --efforts a,b      Reasoning efforts\n  --output PATH      Output directory\n  --prompt TEXT      Inline prompt\n  --prompt-file PATH Read prompt from a file\n  --delay-ms N       Delay between turns\n  --timeout-ms N     Per-turn timeout`);
+      console.log(`Usage: node benchmark.mjs [options]\n\nOptions:\n  --codex-bin PATH    Codex executable (default: codex from PATH)\n  --allow-unlisted-model  Attempt explicitly requested models missing from catalog\n  --service-tier normal|fast  Service tier (default: normal)\n  --models a,b       Model slugs\n  --efforts a,b      Reasoning efforts\n  --output PATH      Output directory\n  --prompt TEXT      Inline prompt\n  --prompt-file PATH Read prompt from a file\n  --delay-ms N       Delay between turns\n  --timeout-ms N     Per-turn timeout`);
       process.exit(0);
     } else {
       throw new Error(`Unknown or incomplete option: ${name}`);
@@ -125,7 +127,7 @@ export async function main(argv = process.argv.slice(2)) {
   const options = await parseArgs(argv);
   const outputDir = resolve(options.output);
   await mkdir(resolve(outputDir, "generated"), { recursive: true });
-  const codexCliVersion = execFileSync("codex", ["--version"], {
+  const codexCliVersion = execFileSync(options.codexBin, ["--version"], {
     encoding: "utf8",
   }).trim();
 
@@ -135,7 +137,7 @@ export async function main(argv = process.argv.slice(2)) {
       effort: options.efforts[(round + modelIndex) % options.efforts.length],
     })),
   );
-  const child = spawn("codex", ["app-server", "--stdio"], {
+  const child = spawn(options.codexBin, ["app-server", "--stdio"], {
     // Do not expose app-server diagnostic logs (which may contain private context).
     stdio: ["pipe", "pipe", "ignore"],
   });
@@ -280,7 +282,7 @@ export async function main(argv = process.argv.slice(2)) {
     catalogEvidence = { includeHidden: true, pageCount, nextCursor: cursor, models: catalog.map(({id, model, hidden}) => ({id, model, hidden})) };
     const missing = options.models.filter((model) => !catalog.some((entry) => entry.model === model));
     if (missing.length && !options.allowUnlistedModel) {
-      throw new Error(`Models absent from catalog: ${missing.join(", ")}; use --allow-unlisted-model with explicit --models to attempt them without fallback`);
+      throw new Error(`Models absent from catalog: ${missing.join(", ")}; check --codex-bin for an outdated PATH CLI, or use --allow-unlisted-model with explicit --models to attempt them without fallback`);
     }
     const selectedCatalog = options.models.map((model) => {
       const entry = catalog.find((candidate) => candidate.model === model);
@@ -443,6 +445,7 @@ export async function main(argv = process.argv.slice(2)) {
             attempts,
             measuredAt: new Date().toISOString(),
             codexCliVersion,
+            codexExecutable: options.codexBin,
             transport: "Codex app-server over stdio",
             serviceTier: options.serviceTier,
             sampleCountPerCondition: 1,

@@ -37,13 +37,37 @@ support. Summaries retain catalog pagination evidence, requested and resolved
 models, thread acknowledgement, warnings, and errors even when setup fails.
 `--allow-unlisted-model` requires an explicit `--models` selection.
 
-On the tested Mac (CLI 0.153.4, October 2, 2026), `gpt-6.1-sol` was absent
-from the complete one-page catalog (`includeHidden: true`, `nextCursor: null`).
-Its explicit Normal attempt preserved that exact model ID but failed with HTTP
-400: “The 'gpt-6.1-sol' model is not supported when using Codex with a ChatGPT
-account.” Its Fast thread returned no tier acknowledgement, so the runner stopped
-before generation. Catalog omission alone was insufficient evidence; the direct
-Normal request established the backend restriction for this login/CLI path.
+### Use the same CLI runtime as your desktop
+
+A stale executable on PATH can expose a different model catalog and produce
+misleading access errors. On the tested Mac, PATH used **0.153.4**, while the
+installed desktop bundled **0.159.0-alpha.12.1**. The old CLI omitted and rejected
+`gpt-6.1-sol`; the desktop binary advertised that exact model and its Fast tier.
+This was a runtime compatibility issue, not evidence that the user's desktop
+account lacked Sol 6.1. The current [official model documentation](https://developers.openai.com/codex/models)
+includes GPT-6.1 Sol in Codex desktop and CLI.
+
+Select the executable explicitly (the bundled path depends on the installation):
+
+```bash
+npm run bench -- \
+  --codex-bin /Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex \
+  --models gpt-6.1-sol --efforts high --service-tier fast
+```
+
+`--codex-bin` controls both version detection and app-server launch. Its default
+is `codex` from PATH; the selected executable and its exact version are recorded
+in every summary. Arguments are passed directly without a shell, including paths
+with spaces. This does not update global software, change credentials, or modify
+your Codex configuration. Prefer the compatible runtime over bypassing catalog
+preflight with `--allow-unlisted-model`.
+
+The corrected runtime completed both `gpt-6.1-sol` / High samples with zero
+errors or reroutes: Normal TTFT **18.589s**, delivered **45.892 TPS**, total
+**34.053s**; Fast TTFT **17.594s**, delivered **50.602 TPS**, total **33.740s**.
+Thread acknowledgements were `default` and `priority`; effective backend tier
+was not exposed. Both generated games passed the existing checker. These were
+single sequential samples, not a statistically controlled speed comparison.
 
 Schema v2 records requested UI tier, protocol ID, thread acknowledgement, and
 an effective tier **only if explicitly observable in upstream response metadata**.

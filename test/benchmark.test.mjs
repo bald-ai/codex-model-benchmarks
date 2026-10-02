@@ -11,10 +11,11 @@ const exec = promisify(execFile);
 test('parse tier, reject malformed options before launching Codex', async () => {
   assert.equal((await parseArgs([])).serviceTier,'normal');
   assert.equal((await parseArgs(['--service-tier','Fast'])).serviceTier,'fast');
+  assert.equal((await parseArgs(['--codex-bin','/path with spaces/codex'])).codexBin,'/path with spaces/codex');
   assert.equal(protocolTier('normal'),'default');
   assert.equal(protocolTier('fast'),'fast');
   assert.equal(protocolTier('fast',{serviceTiers:[{id:'priority',name:'Fast'}]}),'priority');
-  for (const args of [['--allow-unlisted-model'],['--service-tier'],['--service-tier','priority'],['--models'],['--timeout-ms','NaN'],['--delay-ms','-1'],['--models','a,']]) {
+  for (const args of [['--codex-bin'],['--allow-unlisted-model'],['--service-tier'],['--service-tier','priority'],['--models'],['--timeout-ms','NaN'],['--delay-ms','-1'],['--models','a,']]) {
     await assert.rejects(parseArgs(args));
   }
 });
@@ -61,3 +62,21 @@ for (const [tier, scenario] of [['normal','ok'],['fast','ok'],['fast','legacy'],
     } finally { await rm(output,{recursive:true,force:true}); }
   });
 }
+
+test('explicit Codex executable with spaces controls version and app-server', async () => {
+  const { copyFile } = await import('node:fs/promises');
+  const temp = await mkdtemp(resolve(tmpdir(),'codex binary test '));
+  try {
+    const bin = resolve(temp,'custom codex');
+    await copyFile(resolve(import.meta.dirname,'fixtures/codex'),bin);
+    const output = resolve(temp,'results');
+    await exec(process.execPath,['benchmark.mjs','--codex-bin',bin,'--models','test-model','--efforts','high','--service-tier','normal','--output',output],{
+      cwd:resolve(import.meta.dirname,'..'),timeout:8000,
+      env:{...process.env,BENCH_TEST_SCENARIO:'ok',BENCH_TEST_TIER:'default'},
+    });
+    const summary=JSON.parse(await readFile(resolve(output,'summary.json'),'utf8'));
+    assert.equal(summary.codexExecutable,bin);
+    assert.equal(summary.codexCliVersion,'codex-cli fixture');
+    assert.equal(summary.results[0].turnStatus,'completed');
+  } finally { await rm(temp,{recursive:true,force:true}); }
+});
