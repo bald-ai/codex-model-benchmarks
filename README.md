@@ -19,6 +19,32 @@ tiers, RPC failures, observed tier mismatches, and model reroutes. It never retr
 with a cheaper/slower tier. Fast uses more subscription allowance; see
 [official Codex speed documentation](https://developers.openai.com/codex/agent-configuration/speed).
 
+The runner reads every `model/list` page, including hidden models. Catalog
+omission is not necessarily backend access denial. To test an **explicit model
+ID** that is missing from the catalog, opt in:
+
+```bash
+npm run bench -- --models gpt-6.1-sol --efforts high --service-tier normal --allow-unlisted-model
+npm run bench -- --models gpt-6.1-sol --efforts high --service-tier fast --allow-unlisted-model
+```
+
+This prints and records a warning and skips catalog-only capability checks for
+that model. The exact model ID is sent with provider fallback disabled; a different
+resolved model, model reroute, or backend rejection remains an error. For an
+unlisted Fast attempt, the runner requires one unambiguous Fast protocol ID from
+the CLI catalog; this establishes wire spelling, **not** model access or tier
+support. Summaries retain catalog pagination evidence, requested and resolved
+models, thread acknowledgement, warnings, and errors even when setup fails.
+`--allow-unlisted-model` requires an explicit `--models` selection.
+
+On the tested Mac (CLI 0.153.4, October 2, 2026), `gpt-6.1-sol` was absent
+from the complete one-page catalog (`includeHidden: true`, `nextCursor: null`).
+Its explicit Normal attempt preserved that exact model ID but failed with HTTP
+400: “The 'gpt-6.1-sol' model is not supported when using Codex with a ChatGPT
+account.” Its Fast thread returned no tier acknowledgement, so the runner stopped
+before generation. Catalog omission alone was insufficient evidence; the direct
+Normal request established the backend restriction for this login/CLI path.
+
 Schema v2 records requested UI tier, protocol ID, thread acknowledgement, and
 an effective tier **only if explicitly observable in upstream response metadata**.
 Thread acknowledgement is not proof of backend processing. The tested CLI exposed

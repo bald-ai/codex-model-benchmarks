@@ -12,10 +12,14 @@ readline.createInterface({input:process.stdin}).on('line', line => {
   if (scenario === 'exit') process.exit(3);
   if (scenario === 'timeout') return;
   if (method === 'initialize') return reply({});
-  if (method === 'model/list') return reply({data:[{model:'test-model',supportedReasoningEfforts:[{reasoningEffort:'high'},{reasoningEffort:'low'}],serviceTiers:scenario === 'unsupported' ? [] : [{id:process.env.BENCH_TEST_TIER,name:'Fast'}]}]});
+  if (method === 'model/list' && scenario === 'pagination' && !params.cursor) return reply({data:[],nextCursor:'page-2'});
+  if (method === 'model/list' && scenario === 'pagination') assert.equal(params.cursor,'page-2');
+  if (method === 'model/list') return reply({data:[{model:scenario.startsWith('unlisted') ? 'catalog-model' : 'test-model',supportedReasoningEfforts:[{reasoningEffort:'high'},{reasoningEffort:'low'}],serviceTiers:scenario === 'unsupported' ? [] : [{id:process.env.BENCH_TEST_TIER,name:'Fast'}]}]});
   if (method === 'thread/start') {
+    assert.equal(params.allowProviderModelFallback,false);
+    if (scenario === 'unlisted-denied') return send({id,error:{code:-32600,message:'The model gpt-6.1-sol is not supported with this account'}});
     assert.equal(params.serviceTier, process.env.BENCH_TEST_TIER);
-    return reply({model:'test-model', serviceTier:scenario === 'ack-mismatch' ? 'default' : params.serviceTier, thread:{id:'thread'}});
+    return reply({model:scenario === 'unlisted-rerouted' ? 'another-model' : params.model, serviceTier:scenario === 'ack-mismatch' ? 'default' : params.serviceTier, thread:{id:'thread'}});
   }
   if (method === 'turn/start') {
     assert.equal(params.serviceTierForTurn, process.env.BENCH_TEST_TIER);

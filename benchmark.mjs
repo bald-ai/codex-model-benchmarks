@@ -34,16 +34,22 @@ export async function parseArgs(argv) {
     prompt: DEFAULT_PROMPT,
     delayMs: 0,
     serviceTier: "normal",
+    allowUnlistedModel: false,
+    explicitModels: false,
     timeoutMs: 300_000,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const name = argv[index];
     const value = argv[index + 1];
+    if (name === "--allow-unlisted-model") {
+      options.allowUnlistedModel = true;
+      continue;
+    }
     if (name !== "--help" && (!value || value.startsWith("--"))) {
       throw new Error(`Missing value for ${name}`);
     }
     if (name === "--service-tier") options.serviceTier = value.toLowerCase();
-    else if (name === "--models") options.models = value.split(",");
+    else if (name === "--models") { options.models = value.split(","); options.explicitModels = true; }
     else if (name === "--efforts") options.efforts = value.split(",");
     else if (name === "--output") options.output = value;
     else if (name === "--prompt") options.prompt = value;
@@ -52,12 +58,15 @@ export async function parseArgs(argv) {
     } else if (name === "--delay-ms") options.delayMs = Number(value);
     else if (name === "--timeout-ms") options.timeoutMs = Number(value);
     else if (name === "--help") {
-      console.log(`Usage: node benchmark.mjs [options]\n\nOptions:\n  --service-tier normal|fast  Service tier (default: normal)\n  --models a,b       Model slugs\n  --efforts a,b      Reasoning efforts\n  --output PATH      Output directory\n  --prompt TEXT      Inline prompt\n  --prompt-file PATH Read prompt from a file\n  --delay-ms N       Delay between turns\n  --timeout-ms N     Per-turn timeout`);
+      console.log(`Usage: node benchmark.mjs [options]\n\nOptions:\n  --allow-unlisted-model  Attempt explicitly requested models missing from catalog\n  --service-tier normal|fast  Service tier (default: normal)\n  --models a,b       Model slugs\n  --efforts a,b      Reasoning efforts\n  --output PATH      Output directory\n  --prompt TEXT      Inline prompt\n  --prompt-file PATH Read prompt from a file\n  --delay-ms N       Delay between turns\n  --timeout-ms N     Per-turn timeout`);
       process.exit(0);
     } else {
       throw new Error(`Unknown or incomplete option: ${name}`);
     }
     index += 1;
+  }
+  if (options.allowUnlistedModel && !options.explicitModels) {
+    throw new Error("--allow-unlisted-model requires explicit --models");
   }
   protocolTier(options.serviceTier);
   for (const key of ["delayMs", "timeoutMs"]) {
@@ -126,7 +135,6 @@ export async function main(argv = process.argv.slice(2)) {
       effort: options.efforts[(round + modelIndex) % options.efforts.length],
     })),
   );
-  const wantedModels = new Set(options.models);
   const child = spawn("codex", ["app-server", "--stdio"], {
     // Do not expose app-server diagnostic logs (which may contain private context).
     stdio: ["pipe", "pipe", "ignore"],
@@ -241,6 +249,9 @@ export async function main(argv = process.argv.slice(2)) {
   }
 
   const results = [];
+  const warnings = [];
+  const attempts = [];
+  let catalogEvidence = null;
   let failure = null;
 
   try {
@@ -254,14 +265,43 @@ export async function main(argv = process.argv.slice(2)) {
     });
     send({ method: "initialized" });
 
-    const catalog = await request("model/list", { includeHidden: true, limit: 100 });
-    const selectedCatalog = catalog.data.filter((entry) => wantedModels.has(entry.model));
-    const found = new Set(selectedCatalog.map((entry) => entry.model));
-    const missing = options.models.filter((model) => !found.has(model));
-    if (missing.length) throw new Error(`Models unavailable: ${missing.join(", ")}`);
+    const catalog = [];
+    let cursor = null;
+    const seenCursors = new Set();
+    let pageCount = 0;
+    do {
+      const page = await request("model/list", { includeHidden: true, limit: 100, cursor });
+      catalog.push(...page.data);
+      pageCount += 1;
+      cursor = page.nextCursor ?? null;
+      if (cursor && seenCursors.has(cursor)) throw new Error("model/list repeated a pagination cursor");
+      if (cursor) seenCursors.add(cursor);
+    } while (cursor);
+    catalogEvidence = { includeHidden: true, pageCount, nextCursor: cursor, models: catalog.map(({id, model, hidden}) => ({id, model, hidden})) };
+    const missing = options.models.filter((model) => !catalog.some((entry) => entry.model === model));
+    if (missing.length && !options.allowUnlistedModel) {
+      throw new Error(`Models absent from catalog: ${missing.join(", ")}; use --allow-unlisted-model with explicit --models to attempt them without fallback`);
+    }
+    const selectedCatalog = options.models.map((model) => {
+      const entry = catalog.find((candidate) => candidate.model === model);
+      if (entry) return entry;
+      const warning = `${model} is absent from the complete catalog; attempting the exact requested model. Model, effort and tier support are unverified until the server responds. No model fallback.`;
+      warnings.push(warning);
+      console.warn(`Warning: ${warning}`);
+      // Reuse only an unambiguous Fast wire ID advertised by this CLI's catalog.
+      // This establishes protocol spelling, not support for the unlisted model.
+      const fastIds = new Set(catalog.flatMap((item) => item.serviceTiers ?? [])
+        .filter((tier) => tier.id === "fast" || (tier.id === "priority" && tier.name?.toLowerCase() === "fast"))
+        .map((tier) => tier.id));
+      if (options.serviceTier === "fast" && fastIds.size !== 1) {
+        throw new Error("Cannot determine an unambiguous Fast protocol ID for an unlisted model");
+      }
+      return { model, unlisted: true, serviceTiers: [], unlistedProtocolTier: options.serviceTier === "normal" ? "default" : [...fastIds][0] };
+    });
 
     for (const { model, effort } of runs) {
       const entry = selectedCatalog.find((candidate) => candidate.model === model);
+      if (entry.unlisted) continue;
       validateTier(entry, options.serviceTier);
       if (!entry.supportedReasoningEfforts.some((item) => item.reasoningEffort === effort)) {
         throw new Error(`${model} does not support ${effort}`);
@@ -271,7 +311,10 @@ export async function main(argv = process.argv.slice(2)) {
     for (let index = 0; index < runs.length; index += 1) {
       const requested = runs[index];
       const entry = selectedCatalog.find((candidate) => candidate.model === requested.model);
-      const requestedProtocolTier = protocolTier(options.serviceTier, entry);
+      const requestedProtocolTier = entry.unlistedProtocolTier ?? protocolTier(options.serviceTier, entry);
+      const attempt = { requestedModel: requested.model, effort: requested.effort, catalogListed: !entry.unlisted,
+        requestedServiceTier: options.serviceTier, requestedProtocolTier, resolvedModel: null, acknowledgedThreadServiceTier: null };
+      attempts.push(attempt);
       const threadResponse = await request("thread/start", {
         model: requested.model,
         allowProviderModelFallback: false,
@@ -292,6 +335,8 @@ export async function main(argv = process.argv.slice(2)) {
         selectedCapabilityRoots: [],
         experimentalRawEvents: true,
       });
+      attempt.resolvedModel = threadResponse.model;
+      attempt.acknowledgedThreadServiceTier = threadResponse.serviceTier ?? null;
       if (threadResponse.serviceTier !== requestedProtocolTier) {
         throw new Error(`Requested tier ${requestedProtocolTier}; thread acknowledged ${threadResponse.serviceTier ?? "unknown"}`);
       }
@@ -345,6 +390,8 @@ export async function main(argv = process.argv.slice(2)) {
       const result = {
         model: requested.model,
         effort: requested.effort,
+        resolvedModel: threadResponse.model,
+        catalogListed: !entry.unlisted,
         requestedServiceTier: options.serviceTier,
         requestedProtocolTier,
         advertisedServiceTiers: entry.serviceTiers ?? [],
@@ -391,6 +438,9 @@ export async function main(argv = process.argv.slice(2)) {
           {
             schemaVersion: 2,
             failure,
+            warnings,
+            catalogEvidence,
+            attempts,
             measuredAt: new Date().toISOString(),
             codexCliVersion,
             transport: "Codex app-server over stdio",
